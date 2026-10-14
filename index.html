@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>F2F | Food Supply Chain Traceability DApp</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Background glow ambient effects -->
+    <div class="ambient-glow glow-1"></div>
+    <div class="ambient-glow glow-2"></div>
+
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="brand">
+                <div class="brand-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+                    </svg>
+                </div>
+                <div>
+                    <h1>F2F Traceability</h1>
+                    <p class="subtitle">Decentralized Farm-to-Fork Supply Chain • Sepolia EVM</p>
+                </div>
+            </div>
+
+            <div class="header-actions">
+                <div class="network-badge" id="networkBadge">
+                    <span class="status-dot"></span>
+                    <span id="networkName">Sepolia Testnet</span>
+                </div>
+                <div class="contract-info-pill" title="Click to copy contract address" id="copyContractBtn">
+                    <span class="pill-label">Contract:</span>
+                    <span class="pill-val" id="contractAddressDisplay">0x9E52...d604</span>
+                    <svg class="copy-icon" viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" fill="none" stroke-width="2">
+                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                    </svg>
+                </div>
+                <button id="connectWalletBtn" class="btn btn-connect">
+                    <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" fill="none" stroke-width="2">
+                        <path d="M20 7h-9M14 17H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2z"></path>
+                    </svg>
+                    <span>Connect Wallet</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Current User Status Bar -->
+        <div class="user-status-card" id="userStatusCard">
+            <div class="status-col">
+                <span class="label">Connected Account</span>
+                <span class="value mono" id="userAddress">Not Connected</span>
+            </div>
+            <div class="status-col">
+                <span class="label">Registered Role</span>
+                <span class="role-badge role-unassigned" id="userRoleBadge">Unassigned</span>
+            </div>
+            <div class="status-col">
+                <span class="label">Participant Name</span>
+                <span class="value" id="userName">-</span>
+            </div>
+            <div class="status-col">
+                <span class="label">Total Batches Minted</span>
+                <span class="value highlight" id="totalBatchesCount">-</span>
+            </div>
+        </div>
+
+        <!-- Tab Navigation -->
+        <nav class="portal-nav">
+            <button class="nav-tab active" data-tab="explorer">
+                <span class="tab-icon">🔍</span>
+                <span>Traceability Explorer</span>
+            </button>
+            <button class="nav-tab" data-tab="admin">
+                <span class="tab-icon">👑</span>
+                <span>Admin Hub</span>
+            </button>
+            <button class="nav-tab" data-tab="farm">
+                <span class="tab-icon">🌱</span>
+                <span>Farm Batching</span>
+            </button>
+            <button class="nav-tab" data-tab="transfer">
+                <span class="tab-icon">🚚</span>
+                <span>Logistics Transfer</span>
+            </button>
+            <button class="nav-tab" data-tab="recall">
+                <span class="tab-icon">🚨</span>
+                <span>Emergency Recall</span>
+            </button>
+        </nav>
+
+        <!-- Tab Contents -->
+        <main class="main-content">
+            <!-- 1. Traceability Explorer (Public Tab) -->
+            <section class="tab-panel active" id="tab-explorer">
+                <div class="panel-card hero-search-card">
+                    <div class="panel-header">
+                        <h2>Batch Traceability & Verification</h2>
+                        <p>Verify provenance, storage history, custody transfers, and safety status of any frozen food batch.</p>
+                    </div>
+                    <div class="search-bar-wrap">
+                        <input type="number" id="searchProductId" placeholder="Enter Batch Product ID (e.g. 1)" min="1">
+                        <button class="btn btn-primary" id="btnSearchProduct">
+                            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" fill="none" stroke-width="2">
+                                <circle cx="11" cy="11" r="8"></circle>
+                                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                            </svg>
+                            Track Batch
+                        </button>
+                    </div>
+
+                    <!-- Product Details View -->
+                    <div class="product-result" id="productResult" style="display: none;">
+                        <div class="batch-meta-grid">
+                            <div class="meta-item">
+                                <span class="meta-label">Product ID</span>
+                                <span class="meta-value" id="resProductId">#1</span>
+                            </div>
+                            <div class="meta-item">
+                                <span class="meta-label">Lot Code</span>
+                                <span class="meta-value mono" id="resLotCode">-</span>
+                            </div>
+                            <div class="meta-item">
+                                <span class="meta-label">Current Status</span>
+                                <span class="status-tag" id="resStatus">Good</span>
+                            </div>
+                            <div class="meta-item">
+                                <span class="meta-label">Current Custodian</span>
+                                <span class="meta-value mono truncate" id="resCurrentOwner">-</span>
+                            </div>
+                        </div>
+
+                        <!-- Timeline -->
+                        <div class="timeline-container">
+                            <h3>Lifecycle Audit Trail</h3>
+                            <div class="timeline" id="timelineList">
+                                <!-- Populated dynamically -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 2. Admin Hub -->
+            <section class="tab-panel" id="tab-admin">
+                <div class="panel-card">
+                    <div class="panel-header">
+                        <div class="badge-tag">Admin Access Only</div>
+                        <h2>Register Supply Chain Participant</h2>
+                        <p>Authorize farms, manufacturers, distributors, or retailers to interact with the supply chain.</p>
+                    </div>
+                    <form id="formRegister" onsubmit="return false;" class="form-grid">
+                        <div class="form-group span-2">
+                            <label for="pAddress">Ethereum Wallet Address (0x...)</label>
+                            <input type="text" id="pAddress" placeholder="0x..." required pattern="^0x[a-fA-F0-9]{40}$">
+                            <small class="helper-text">The participant will sign transactions with this wallet</small>
+                        </div>
+                        <div class="form-group">
+                            <label for="pName">Entity Name</label>
+                            <input type="text" id="pName" placeholder="e.g. Arctic Fresh Fisheries Ltd." required>
+                        </div>
+                        <div class="form-group">
+                            <label for="pRole">Supply Chain Role</label>
+                            <select id="pRole" required>
+                                <option value="1">🌱 Farm (Producer)</option>
+                                <option value="2">🏭 Manufacturer</option>
+                                <option value="3">🚚 Distributor</option>
+                                <option value="4">🏪 Retailer</option>
+                            </select>
+                        </div>
+                        <div class="form-actions span-2">
+                            <button type="button" class="btn btn-primary" id="btnRegisterParticipant">
+                                Register Participant
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </section>
+
+            <!-- 3. Farm Batch Creation -->
+            <section class="tab-panel" id="tab-farm">
+                <div class="panel-card">
+                    <div class="panel-header">
+                        <div class="badge-tag green">Farm Role Only</div>
+                        <h2>Create New Food Batch</h2>
+                        <p>Farms initiate the product lifecycle by registering an immutable 8-digit lot code.</p>
+                    </div>
+                    <form id="formCreateBatch" onsubmit="return false;" class="form-grid">
+                        <div class="form-group span-2">
+                            <label for="lotCodeInput">Lot Code (Identification Code)</label>
+                            <input type="text" id="lotCodeInput" placeholder="e.g. 20261013" required>
+                            <small class="helper-text">Unique batch code stamped on physical shipment</small>
+                        </div>
+                        <div class="form-actions span-2">
+                            <button type="button" class="btn btn-primary" id="btnCreateBatch">
+                                Mint & Register Batch
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </section>
+
+            <!-- 4. Logistics Transfer -->
+            <section class="tab-panel" id="tab-transfer">
+                <div class="panel-card">
+                    <div class="panel-header">
+                        <div class="badge-tag">Registered Custodian Only</div>
+                        <h2>Transfer Custody of Batch</h2>
+                        <p>Transfer product custody down the supply chain (e.g. Farm ➔ Distributor ➔ Retailer).</p>
+                    </div>
+                    <form id="formTransfer" onsubmit="return false;" class="form-grid">
+                        <div class="form-group">
+                            <label for="transferId">Product ID</label>
+                            <input type="number" id="transferId" placeholder="e.g. 1" min="1" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="newOwner">Recipient Registered Address (0x...)</label>
+                            <input type="text" id="newOwner" placeholder="0x..." required pattern="^0x[a-fA-F0-9]{40}$">
+                        </div>
+                        <div class="form-actions span-2">
+                            <button type="button" class="btn btn-primary" id="btnTransferBatch">
+                                Execute Ownership Transfer
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </section>
+
+            <!-- 5. Emergency Recall -->
+            <section class="tab-panel" id="tab-recall">
+                <div class="panel-card danger-card">
+                    <div class="panel-header">
+                        <div class="badge-tag red">Safety Protocol • Admin Only</div>
+                        <h2>Trigger Emergency Product Recall</h2>
+                        <p>Quarantine all products associated with a compromised lot code across the entire supply chain.</p>
+                    </div>
+                    <form id="formRecall" onsubmit="return false;" class="form-grid">
+                        <div class="form-group span-2">
+                            <label for="recallLotCodeInput">Compromised Lot Code</label>
+                            <input type="text" id="recallLotCodeInput" placeholder="e.g. 20261013" required>
+                            <small class="helper-text alert-text">Warning: This permanently marks all associated batches as Recalled.</small>
+                        </div>
+                        <div class="form-actions span-2">
+                            <button type="button" class="btn btn-danger" id="btnTriggerRecall">
+                                🚨 Trigger Product Recall
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </section>
+        </main>
+
+        <!-- Live Activity Console -->
+        <section class="activity-section">
+            <div class="activity-header">
+                <h3>Live Blockchain Activity Log</h3>
+                <button class="btn-text" id="btnClearLogs">Clear Log</button>
+            </div>
+            <div class="activity-log" id="activityLogs">
+                <div class="log-entry system">
+                    <span class="log-time">[System]</span>
+                    <span class="log-msg">F2F Traceability DApp initialized. Please connect your MetaMask wallet on Sepolia.</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Toast Notifications -->
+        <div class="toast-container" id="toastContainer"></div>
+    </div>
+
+    <!-- Ethers.js library (UMD) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
+    <script src="app.js?v=2"></script>
+</body>
+</html>
